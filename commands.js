@@ -1,14 +1,12 @@
 /**
  * Kalexius – Wrike Task ID Validator
  * commands.js  v3.0.0
- *
- * If From = a watched address AND subject has no [1234] → block.
- * All other senders → send freely.
  */
 
 /* global Office */
 
 var WATCHED_EMAILS = [
+  "panama@odyssey.limited",
   "gravity@odyssey.limited",
   "elektra@odyssey.limited",
   "eversana@odyssey.limited",
@@ -19,8 +17,7 @@ var WATCHED_EMAILS = [
   "quartz@odyssey.limited",
   "nexus@odyssey.limited",
   "expertise.innovation@kalexius.com",
-  "bearcomcosec@odyssey.limited",
-  "panama@odyssey.limited"
+  "bearcomcosec@odyssey.limited"
 ];
 
 Office.initialize = function () {};
@@ -37,13 +34,11 @@ function validateSubject(event) {
       }
 
       var fromEmail = (fromResult.value.emailAddress || "").toLowerCase().trim();
-
-      var isWatched = WATCHED_EMAILS.some(function (a) {
-        return fromEmail === a.toLowerCase().trim();
+      var isWatched = WATCHED_EMAILS.some(function (address) {
+        return fromEmail === address.toLowerCase().trim();
       });
 
       if (!isWatched) {
-        // Not a watched address — send freely
         event.completed({ allowEvent: true });
         return;
       }
@@ -60,12 +55,6 @@ function validateSubject(event) {
         if (hasTaskId) {
           event.completed({ allowEvent: true });
         } else {
-          // Block — open taskpane so user sees the instruction
-          Office.context.ui.displayDialogAsync(
-            "https://klxit.github.io/KLX-Outlook-Plug-in/taskpane.html",
-            { height: 40, width: 25, displayInIframe: true },
-            function () {}
-          );
           event.completed({ allowEvent: false });
         }
       });
