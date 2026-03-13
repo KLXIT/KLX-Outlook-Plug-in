@@ -1,6 +1,8 @@
 /**
  * Kalexius – Wrike Task ID Validator
- * commands.js  v2.6.1
+ * commands.js  v2.6.2
+ *
+ * Requires Mailbox 1.13 for custom errorMessage + PromptUser send mode.
  */
 
 /* global Office */
@@ -45,7 +47,11 @@ function validateSubject(event) {
         if (hasTaskId) {
           event.completed({ allowEvent: true });
         } else {
-          event.completed({ allowEvent: false });
+          event.completed({
+            allowEvent: false,
+            errorMessage: "Please add the Wrike Task ID to the subject using the format [1234] before sending.",
+            sendModeOverride: Office.MailboxEnums.SendModeOverride.PromptUser
+          });
         }
       });
     });
