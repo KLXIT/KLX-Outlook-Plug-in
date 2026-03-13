@@ -7,11 +7,11 @@
   xsi:type="MailApp">
 
   <Id>eeead739-4b57-4b77-95cd-796e778c4b21</Id>
-  <Version>2.1.0</Version>
+  <Version>2.6.1</Version>
   <ProviderName>Kalexius</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Wrike ID Validator"/>
-  <Description DefaultValue="Validates that a Wrike Task ID is present in the email subject before sending. Warns once, then allows send on second attempt."/>
+  <Description DefaultValue="Validates that a Wrike Task ID is present in the email subject before sending."/>
 
   <IconUrl DefaultValue="https://klxit.github.io/KLX-Outlook-Plug-in/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://klxit.github.io/KLX-Outlook-Plug-in/assets/icon-128.png"/>
@@ -61,7 +61,12 @@
           <DesktopFormFactor>
             <FunctionFile resid="Commands.Url"/>
             <ExtensionPoint xsi:type="Events">
-              <Event Type="ItemSend" FunctionExecution="synchronous" FunctionName="validateSubject"/>
+              <Event
+                Type="ItemSend"
+                FunctionExecution="synchronous"
+                FunctionName="validateSubject"
+                SendMode="softBlock"
+              />
             </ExtensionPoint>
           </DesktopFormFactor>
         </Host>
@@ -79,6 +84,7 @@
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Wrike ID Validator"/>
+          <bt:String id="BlockedMessage" DefaultValue="Please add the Wrike Task ID to the subject using the format [1234] before sending."/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="Description" DefaultValue="Validates Wrike Task ID in email subject before sending."/>
