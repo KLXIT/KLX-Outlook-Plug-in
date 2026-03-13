@@ -1,66 +1,113 @@
 /**
  * Kalexius – Wrike Task ID Validator
- * commands.js  v2.1.0
+ * commands.js  v2.4.0
  *
- * Compatible with Mailbox 1.10 (no SendModeOverride needed).
+ * Shared mailbox aware:
+ *  - Checks the "From" field shown in the compose window
+ *    (works correctly even when sending from a shared mailbox)
+ *  - Only validates emails being sent FROM watched domains
+ *  - All other senders pass through freely
  *
- * Flow:
- *  - Subject HAS [12345]       → allow immediately
- *  - Subject missing Task ID, 1st Send → block with warning message
- *  - Subject missing Task ID, 2nd Send → allow through (user confirmed)
- *
- * This gives users the "ignore and send anyway" behaviour
- * without requiring Mailbox 1.13.
+ * Flow (watched domains only):
+ *  - Subject HAS [12345]   → allow immediately
+ *  - 1st Send, no Task ID  → block with warning, set flag
+ *  - 2nd Send, flag set    → allow through
  */
 
 /* global Office */
 
-// Per-compose-window flag. Resets when compose window closes.
-var _userHasBeenWarned = false;
+// ─── CONFIGURE YOUR DOMAINS HERE ────────────────────────────────────────────
+var WATCHED_DOMAINS = [
+  "odyssey.limited",
+  "kalexius.com",
+  "flagshiplegal.com"
+];
+// ────────────────────────────────────────────────────────────────────────────
 
 Office.initialize = function () {};
 Office.onReady(function () {});
 
 function validateSubject(event) {
   try {
-    Office.context.mailbox.item.subject.getAsync(function (result) {
+    var item = Office.context.mailbox.item;
 
-      if (result.status !== Office.AsyncResultStatus.Succeeded) {
-        // Can't read subject — fail open
-        _userHasBeenWarned = false;
+    // item.from reflects the actual From field selected in compose
+    // including shared mailboxes — this is the correct field to use
+    item.from.getAsync(function (fromResult) {
+
+      var senderDomain = "";
+
+      if (fromResult.status === Office.AsyncResultStatus.Succeeded) {
+        var email = (fromResult.value.emailAddress || "").toLowerCase();
+        senderDomain = email.split("@")[1] || "";
+      }
+
+      // If item.from didn't give us a watched domain, also check
+      // the logged-in user's profile as a fallback (edge case)
+      var profileEmail = (Office.context.mailbox.userProfile.emailAddress || "").toLowerCase();
+      var profileDomain = profileEmail.split("@")[1] || "";
+
+      var shouldValidate =
+        WATCHED_DOMAINS.some(function (d) { return senderDomain === d.toLowerCase(); }) ||
+        WATCHED_DOMAINS.some(function (d) { return profileDomain === d.toLowerCase(); });
+
+      if (!shouldValidate) {
+        // ✅ Not a watched domain — skip validation, send freely
         event.completed({ allowEvent: true });
         return;
       }
 
-      var subject = result.value || "";
-      var hasTaskId = /\[\d+\]/.test(subject);
+      // ── Watched domain matched — run Task ID check ───────────────────────
 
-      if (hasTaskId) {
-        // ✅ Task ID found — always allow
-        _userHasBeenWarned = false;
-        event.completed({ allowEvent: true });
+      item.loadCustomPropertiesAsync(function (cpResult) {
+        var props = cpResult.value;
+        var alreadyWarned = props.get("wrikeWarned") === true;
 
-      } else if (_userHasBeenWarned) {
-        // ✅ Already warned — user is clicking Send a 2nd time, let it through
-        _userHasBeenWarned = false;
-        event.completed({ allowEvent: true });
+        item.subject.getAsync(function (subResult) {
+          if (subResult.status !== Office.AsyncResultStatus.Succeeded) {
+            props.remove("wrikeWarned");
+            props.saveAsync(function () {
+              event.completed({ allowEvent: true });
+            });
+            return;
+          }
 
-      } else {
-        // ⚠️ First send attempt, no Task ID — warn and block
-        _userHasBeenWarned = true;
-        event.completed({
-          allowEvent: false,
-          errorMessage:
-            "No Wrike Task ID found in the subject. " +
-            "Add one using the format [12345] at the end of your subject. " +
-            "Click Send again to send without a Task ID."
+          var subject = subResult.value || "";
+          var hasTaskId = /\[\d+\]/.test(subject);
+
+          if (hasTaskId) {
+            // ✅ Task ID present — allow
+            props.remove("wrikeWarned");
+            props.saveAsync(function () {
+              event.completed({ allowEvent: true });
+            });
+
+          } else if (alreadyWarned) {
+            // ✅ 2nd Send — user confirmed, allow through
+            props.remove("wrikeWarned");
+            props.saveAsync(function () {
+              event.completed({ allowEvent: true });
+            });
+
+          } else {
+            // ⚠️ 1st Send, no Task ID — warn and block
+            props.set("wrikeWarned", true);
+            props.saveAsync(function () {
+              event.completed({
+                allowEvent: false,
+                errorMessage:
+                  "No Wrike Task ID found in the subject. " +
+                  "Add one using the format [12345] at the end of your subject. " +
+                  "Click Send again to send without a Task ID."
+              });
+            });
+          }
         });
-      }
+      });
     });
 
   } catch (err) {
     console.error("[WrikeValidator] Error:", err);
-    _userHasBeenWarned = false;
     event.completed({ allowEvent: true });
   }
 }
