@@ -69,8 +69,7 @@ function validateSubject(event) {
           event.completed({
             allowEvent: false,
             errorMessage:
-              "A Wrike Task ID is required when sending from " + fromEmail + ". " +
-              "Please add it at the end of the subject using the format [12345], then click Send."
+              "Please add the Wrike Task ID at the end of the subject line using the format [1234], then click Send."
           });
         }
       });
