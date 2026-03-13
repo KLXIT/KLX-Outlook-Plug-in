@@ -1,8 +1,9 @@
 /**
  * Kalexius – Wrike Task ID Validator
- * commands.js  v2.6.2
+ * commands.js  v2.6.3
  *
- * Requires Mailbox 1.13 for custom errorMessage + PromptUser send mode.
+ * On block: opens the taskpane automatically so user sees
+ * exactly what to fix — works on Mailbox 1.10.
  */
 
 /* global Office */
@@ -26,8 +27,8 @@ function validateSubject(event) {
       }
 
       var fromEmail = (fromResult.value.emailAddress || "").toLowerCase().trim();
-      var isWatched = WATCHED_EMAILS.some(function (address) {
-        return fromEmail === address.toLowerCase().trim();
+      var isWatched = WATCHED_EMAILS.some(function (a) {
+        return fromEmail === a.toLowerCase().trim();
       });
 
       if (!isWatched) {
@@ -47,11 +48,13 @@ function validateSubject(event) {
         if (hasTaskId) {
           event.completed({ allowEvent: true });
         } else {
-          event.completed({
-            allowEvent: false,
-            errorMessage: "Please add the Wrike Task ID to the subject using the format [1234] before sending.",
-            sendModeOverride: Office.MailboxEnums.SendModeOverride.PromptUser
-          });
+          // Open the taskpane so user sees the clear error message
+          Office.context.ui.displayDialogAsync(
+            "https://klxit.github.io/KLX-Outlook-Plug-in/taskpane.html",
+            { height: 60, width: 30, displayInIframe: true },
+            function () {}
+          );
+          event.completed({ allowEvent: false });
         }
       });
     });
