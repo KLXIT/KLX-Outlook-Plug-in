@@ -1,6 +1,11 @@
 /**
  * Kalexius – Wrike Task ID Validator
- * commands.js  v3.0.0
+ * commands.js  v3.1.0
+ *
+ * Shared mailbox aware:
+ * - Uses item.from first
+ * - Falls back to getSharedPropertiesAsync to get the real shared mailbox address
+ * - Checks both against WATCHED_EMAILS
  */
 
 /* global Office */
@@ -23,41 +28,58 @@ var WATCHED_EMAILS = [
 Office.initialize = function () {};
 Office.onReady(function () {});
 
+function isWatchedEmail(email) {
+  return WATCHED_EMAILS.some(function (a) {
+    return (email || "").toLowerCase().trim() === a.toLowerCase().trim();
+  });
+}
+
+function checkSubjectAndComplete(event) {
+  var item = Office.context.mailbox.item;
+  item.subject.getAsync(function (subResult) {
+    if (subResult.status !== Office.AsyncResultStatus.Succeeded) {
+      event.completed({ allowEvent: true });
+      return;
+    }
+    var hasTaskId = /\[\d+\]/.test(subResult.value || "");
+    event.completed({ allowEvent: hasTaskId });
+  });
+}
+
 function validateSubject(event) {
   try {
     var item = Office.context.mailbox.item;
 
     item.from.getAsync(function (fromResult) {
-      if (fromResult.status !== Office.AsyncResultStatus.Succeeded) {
-        event.completed({ allowEvent: true });
+      var fromEmail = "";
+      if (fromResult.status === Office.AsyncResultStatus.Succeeded) {
+        fromEmail = (fromResult.value.emailAddress || "").toLowerCase().trim();
+      }
+
+      if (isWatchedEmail(fromEmail)) {
+        // from.getAsync returned a watched address — check subject
+        checkSubjectAndComplete(event);
         return;
       }
 
-      var fromEmail = (fromResult.value.emailAddress || "").toLowerCase().trim();
-      var isWatched = WATCHED_EMAILS.some(function (address) {
-        return fromEmail === address.toLowerCase().trim();
-      });
-
-      if (!isWatched) {
+      // from.getAsync may have returned the delegate's address instead
+      // of the shared mailbox — try getSharedPropertiesAsync as fallback
+      if (item.getSharedPropertiesAsync) {
+        item.getSharedPropertiesAsync(function (sharedResult) {
+          if (sharedResult.status === Office.AsyncResultStatus.Succeeded) {
+            var sharedEmail = (sharedResult.value.targetMailbox || "").toLowerCase().trim();
+            if (isWatchedEmail(sharedEmail)) {
+              checkSubjectAndComplete(event);
+              return;
+            }
+          }
+          // Neither from nor shared mailbox is watched — send freely
+          event.completed({ allowEvent: true });
+        });
+      } else {
+        // getSharedPropertiesAsync not available — send freely
         event.completed({ allowEvent: true });
-        return;
       }
-
-      item.subject.getAsync(function (subResult) {
-        if (subResult.status !== Office.AsyncResultStatus.Succeeded) {
-          event.completed({ allowEvent: true });
-          return;
-        }
-
-        var subject   = subResult.value || "";
-        var hasTaskId = /\[\d+\]/.test(subject);
-
-        if (hasTaskId) {
-          event.completed({ allowEvent: true });
-        } else {
-          event.completed({ allowEvent: false });
-        }
-      });
     });
 
   } catch (err) {
