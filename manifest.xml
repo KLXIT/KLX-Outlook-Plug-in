@@ -7,7 +7,7 @@
   xsi:type="MailApp">
 
   <Id>eeead739-4b57-4b77-95cd-796e778c4b21</Id>
-  <Version>2.6.2</Version>
+  <Version>2.6.3</Version>
   <ProviderName>Kalexius</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Wrike ID Validator"/>
@@ -51,7 +51,7 @@
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
 
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.13">
+        <bt:Sets DefaultMinVersion="1.10">
           <bt:Set Name="Mailbox"/>
         </bt:Sets>
       </Requirements>
@@ -65,7 +65,6 @@
                 Type="ItemSend"
                 FunctionExecution="synchronous"
                 FunctionName="validateSubject"
-                SendMode="PromptUser"
               />
             </ExtensionPoint>
           </DesktopFormFactor>
