@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+  xsi:type="MailApp">
+
+  <!-- ============================================================
+       KALEXIUS – Wrike Task ID Validator for Outlook
+       Version 2.0.0
+       ============================================================
+       IMPORTANT: Replace every occurrence of YOUR_GITHUB_USERNAME
+       with your actual GitHub username before deploying.
+       Replace YOUR_REPO_NAME with your GitHub Pages repo name.
+       Base URL example: https://yourname.github.io/your-repo
+       ============================================================ -->
+
+  <Id>eeead739-4b57-4b77-95cd-796e778c4b21</Id>
+  <Version>2.0.0</Version>
+  <ProviderName>Kalexius</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Wrike ID Validator"/>
+  <Description DefaultValue="Validates that a Wrike Task ID is present in the email subject before sending. Warns once, then allows send on second attempt."/>
+
+  <IconUrl DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/assets/icon-128.png"/>
+  <SupportUrl DefaultValue="https://kalexius.com/support"/>
+
+  <AppDomains>
+    <AppDomain>https://YOUR_GITHUB_USERNAME.github.io</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.10"/>
+    </Sets>
+  </Requirements>
+
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/taskpane.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <Permissions>ReadWriteItem</Permissions>
+
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="ReadOrEdit"/>
+  </Rule>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.10">
+          <bt:Set Name="Mailbox"/>
+        </bt:Sets>
+      </Requirements>
+
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <DesktopFormFactor>
+            <FunctionFile resid="Commands.Url"/>
+            <ExtensionPoint xsi:type="Events">
+              <!-- Fires synchronously on Send -->
+              <Event Type="ItemSend" FunctionExecution="synchronous" FunctionName="validateSubject"/>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+
+      <Resources>
+        <bt:Images>
+          <bt:Image id="Icon.16x16"  DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/assets/icon-16.png"/>
+          <bt:Image id="Icon.32x32"  DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/assets/icon-32.png"/>
+          <bt:Image id="Icon.80x80"  DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/assets/icon-80.png"/>
+        </bt:Images>
+        <bt:Urls>
+          <bt:Url id="Commands.Url"  DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/commands.html"/>
+          <bt:Url id="Taskpane.Url"  DefaultValue="https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/taskpane.html"/>
+        </bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="GroupLabel" DefaultValue="Wrike ID Validator"/>
+        </bt:ShortStrings>
+        <bt:LongStrings>
+          <bt:String id="Description" DefaultValue="Validates Wrike Task ID in email subject before sending."/>
+        </bt:LongStrings>
+      </Resources>
+
+    </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>
