@@ -7,7 +7,7 @@
   xsi:type="MailApp">
 
   <Id>eeead739-4b57-4b77-95cd-796e778c4b21</Id>
-  <Version>2.6.3</Version>
+  <Version>3.0.0</Version>
   <ProviderName>Kalexius</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Wrike ID Validator"/>
@@ -61,11 +61,7 @@
           <DesktopFormFactor>
             <FunctionFile resid="Commands.Url"/>
             <ExtensionPoint xsi:type="Events">
-              <Event
-                Type="ItemSend"
-                FunctionExecution="synchronous"
-                FunctionName="validateSubject"
-              />
+              <Event Type="ItemSend" FunctionExecution="synchronous" FunctionName="validateSubject"/>
             </ExtensionPoint>
           </DesktopFormFactor>
         </Host>
