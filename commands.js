@@ -1,16 +1,26 @@
 /**
  * Kalexius – Wrike Task ID Validator
- * commands.js  v2.6.3
+ * commands.js  v3.0.0
  *
- * On block: opens the taskpane automatically so user sees
- * exactly what to fix — works on Mailbox 1.10.
+ * If From = a watched address AND subject has no [1234] → block.
+ * All other senders → send freely.
  */
 
 /* global Office */
 
 var WATCHED_EMAILS = [
-  "panama@odyssey.limited",
-  "gravity@odyssey.limited"
+  "gravity@odyssey.limited",
+  "elektra@odyssey.limited",
+  "eversana@odyssey.limited",
+  "filings@odyssey.limited",
+  "genesyscosec@odyssey.limited",
+  "herschelcosec@odyssey.limited",
+  "ifit@odyssey.limited",
+  "quartz@odyssey.limited",
+  "nexus@odyssey.limited",
+  "expertise.innovation@kalexius.com",
+  "bearcomcosec@odyssey.limited",
+  "panama@odyssey.limited"
 ];
 
 Office.initialize = function () {};
@@ -27,11 +37,13 @@ function validateSubject(event) {
       }
 
       var fromEmail = (fromResult.value.emailAddress || "").toLowerCase().trim();
+
       var isWatched = WATCHED_EMAILS.some(function (a) {
         return fromEmail === a.toLowerCase().trim();
       });
 
       if (!isWatched) {
+        // Not a watched address — send freely
         event.completed({ allowEvent: true });
         return;
       }
@@ -48,10 +60,10 @@ function validateSubject(event) {
         if (hasTaskId) {
           event.completed({ allowEvent: true });
         } else {
-          // Open the taskpane so user sees the clear error message
+          // Block — open taskpane so user sees the instruction
           Office.context.ui.displayDialogAsync(
             "https://klxit.github.io/KLX-Outlook-Plug-in/taskpane.html",
-            { height: 60, width: 30, displayInIframe: true },
+            { height: 40, width: 25, displayInIframe: true },
             function () {}
           );
           event.completed({ allowEvent: false });
