@@ -4,7 +4,7 @@
   <Version>3.2.0</Version>
   <ProviderName>Kalexius</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Wrike ID Reminder, e.g. [123]"/>
+  <DisplayName DefaultValue="Reminder: Insert Wrike ID e.g. [123]"/>
   <Description DefaultValue="Reminds users to add a Wrike ID e.g. [123] in the email subject before sending"/>
   <IconUrl DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/icon-128.png"/>
@@ -64,7 +64,7 @@
           <bt:Url id="Taskpane.Url" DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
-          <bt:String id="GroupLabel" DefaultValue="Wrike ID Reminder, e.g. [123]"/>
+          <bt:String id="GroupLabel" DefaultValue="Reminder: Insert Wrike ID e.g. [123]]"/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="Description" DefaultValue="Reminds users to add Wrike ID e.g. [123] in subject"/>
