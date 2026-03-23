@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>eeead739-4b57-4b77-95cd-796e778c4b21</Id>
-  <Version>3.1.0</Version>
+  <Version>3.2.0</Version>
   <ProviderName>Kalexius</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Wrike ID Validator"/>
-  <Description DefaultValue="Validates Wrike ID in email subject before sending"/>
+  <DisplayName DefaultValue="Wrike ID Reminder, e.g. [123]"/>
+  <Description DefaultValue="Reminds users to add a Wrike ID e.g. [123] in the email subject before sending"/>
   <IconUrl DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/icon-128.png"/>
   <SupportUrl DefaultValue="https://klxit.github.io/KLX-Outlook-Plug-in/"/>
@@ -64,10 +64,10 @@
           <bt:Url id="Taskpane.Url" DefaultValue="https://samuelmsft.github.io/Kal-outlook-task-id-validator/task-id-validator/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
-          <bt:String id="GroupLabel" DefaultValue="Wrike ID Validator"/>
+          <bt:String id="GroupLabel" DefaultValue="Wrike ID Reminder, e.g. [123]"/>
         </bt:ShortStrings>
         <bt:LongStrings>
-          <bt:String id="Description" DefaultValue="Validates Wrike ID in subject"/>
+          <bt:String id="Description" DefaultValue="Reminds users to add Wrike ID e.g. [123] in subject"/>
         </bt:LongStrings>
       </Resources>
     </VersionOverrides>
