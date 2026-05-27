@@ -22,7 +22,8 @@ var WATCHED_EMAILS = [
   "quartz@odyssey.limited",
   "nexus@odyssey.limited",
   "expertise.innovation@kalexius.com",
-  "bearcomcosec@odyssey.limited"
+  "bearcomcosec@odyssey.limited",
+  "lgemea@odyssey.limited"
 ];
 
 Office.initialize = function () {};
